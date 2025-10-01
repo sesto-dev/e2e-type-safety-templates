@@ -9,8 +9,6 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY /prisma ./prisma
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 RUN apk add --no-cache curl ca-certificates
 RUN corepack enable pnpm && pnpm i --frozen-lockfile
