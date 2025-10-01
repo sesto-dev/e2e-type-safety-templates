@@ -1,0 +1,167 @@
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "1m"
+    max-file: "1"
+    tag: "{{.Name}}"
+
+x-common-labels: &default-labels
+  logging: "promtail"
+  logging_jobname: "containerlogs"
+  stackname: "docker-monitoring-stack-gpnc"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-dn-openapi-template
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - default
+    ports:
+      - "5433:5432" # This line exposes Postgres on the VPS public IP
+    labels:
+      <<: *default-labels
+    logging: *default-logging
+
+  next:
+    build:
+      context: ./next
+      dockerfile: Dockerfile
+    container_name: next-dn-openapi-template
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    labels:
+      <<: *default-labels
+      traefik.enable: true
+      traefik.docker.network: traefik-public
+
+      traefik.http.routers.frontend-dn-openapi-template-client-http.rule: Host(`${NEXT_DOMAIN}`)
+      traefik.http.routers.frontend-dn-openapi-template-client-http.entrypoints: http
+      traefik.http.routers.frontend-dn-openapi-template-client-http.middlewares: https-redirect
+      traefik.http.routers.frontend-dn-openapi-template-client-http.service: frontend-dn-openapi-template-client-service
+
+      traefik.http.routers.frontend-dn-openapi-template-client-https.rule: Host(`${NEXT_DOMAIN}`)
+      traefik.http.routers.frontend-dn-openapi-template-client-https.entrypoints: https
+      traefik.http.routers.frontend-dn-openapi-template-client-https.tls: true
+      traefik.http.routers.frontend-dn-openapi-template-client-https.tls.certresolver: le
+      traefik.http.routers.frontend-dn-openapi-template-client-https.service: frontend-dn-openapi-template-client-service
+
+      traefik.http.services.frontend-dn-openapi-template-client-service.loadbalancer.server.port: 3000
+      traefik.http.middlewares.frontend-dn-openapi-template-client-headers.headers.customrequestheaders.X-Forwarded-Proto: https
+    logging: *default-logging
+    networks:
+      - traefik-public
+      - default
+    depends_on:
+      - postgres
+      - django
+
+  django:
+    build:
+      context: django
+      dockerfile: Dockerfile
+    container_name: django-dn-openapi-template
+    volumes:
+      - static_volume:/app/staticfiles
+    restart: unless-stopped
+    ports:
+      - 8001:8000
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - default
+      - traefik-public
+    labels:
+      <<: *default-labels
+      traefik.enable: true
+      traefik.docker.network: traefik-public
+
+      traefik.http.routers.django-dn-openapi-template-http.rule: Host(`${API_DOMAIN}`)
+      traefik.http.routers.django-dn-openapi-template-http.entrypoints: http
+      traefik.http.routers.django-dn-openapi-template-http.middlewares: https-redirect
+      traefik.http.routers.django-dn-openapi-template-http.service: django-dn-openapi-template-service
+
+      traefik.http.routers.django-dn-openapi-template-https.rule: Host(`${API_DOMAIN}`)
+      traefik.http.routers.django-dn-openapi-template-https.entrypoints: https
+      traefik.http.routers.django-dn-openapi-template-https.tls: true
+      traefik.http.routers.django-dn-openapi-template-https.tls.certresolver: le
+      traefik.http.routers.django-dn-openapi-template-https.service: django-dn-openapi-template-service
+
+      traefik.http.services.django-dn-openapi-template-service.loadbalancer.server.port: 8000
+
+      traefik.http.routers.django-static.rule: Host(`${API_DOMAIN}`) && PathPrefix(`/static/`)
+      traefik.http.routers.django-static.service: django-dn-openapi-template-service
+      traefik.http.middlewares.static-stripprefix.stripprefix.prefixes: /static
+      traefik.http.routers.django-static.middlewares: static-stripprefix@docker
+    logging: *default-logging
+
+  celery:
+    build:
+      context: django
+      dockerfile: Dockerfile
+    container_name: celery-dn-openapi-template
+    command: celery -A main worker --loglevel=info --concurrency=3
+    volumes:
+      - static_volume:/app/staticfiles
+    env_file:
+      - .env
+    depends_on:
+      - django
+      - redis
+    networks:
+      - default
+    labels:
+      <<: *default-labels
+    logging: *default-logging
+
+  celery-beat:
+    build:
+      context: django
+      dockerfile: Dockerfile
+    container_name: celery-beat-dn-openapi-template
+    command: celery -A main beat --loglevel=info
+    volumes:
+      - static_volume:/app/staticfiles
+    env_file:
+      - .env
+    depends_on:
+      - celery
+      - redis
+    networks:
+      - default
+    labels:
+      <<: *default-labels
+    logging: *default-logging
+
+  redis:
+    image: redis:latest
+    container_name: redis-dn-openapi-template
+    ports:
+      - 6380:6379
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+      - default
+    labels:
+      <<: *default-labels
+    logging: *default-logging
+
+volumes:
+  postgres-data:
+  static_volume:
+
+networks:
+  default:
+    driver: bridge
+  traefik-public:
+    external: true

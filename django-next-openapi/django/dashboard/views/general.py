@@ -1,0 +1,50 @@
+# dashboard/views/general.py
+
+import logging
+import secrets
+from decimal import Decimal
+
+from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError, PermissionDenied
+
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
+from dashboard.views.helpers import AuthenticatedViewSet
+from dashboard.serializers import general as serializers
+ 
+logger = logging.getLogger(__name__)
+
+User = get_user_model()
+
+def get_by_query_or_400(request, model, param_map: dict):
+    """
+    param_map: mapping of query param name -> model field lookup (e.g. {"user": "user_id", "organization": "organization_id"})
+    Raises ValidationError if missing params, returns object via get_object_or_404.
+    """
+    kwargs = {}
+    for qparam, lookup in param_map.items():
+        val = request.query_params.get(qparam)
+        if not val:
+            raise ValidationError(f"Query parameter '{qparam}' is required.")
+        # if lookup expects case-insensitive email e.g. 'email__iexact', pass that string directly
+        kwargs[lookup] = val
+    return get_object_or_404(model, **kwargs)
+
+class UserViewSet(AuthenticatedViewSet):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+    filterset_fields = ["id", "email", "name", "phone", "birthday", "created_at", "updated_at", "organizations__id", "organizations__slug"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.prefetch_related("memberships__organization")
+
+    def get_object(self):
+        # Always operate on the authenticated user for /users/me style endpoints
+        return self.request.user
