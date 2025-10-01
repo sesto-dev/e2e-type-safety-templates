@@ -27,11 +27,11 @@ services:
 
       # HTTP router configuration
       traefik.http.routers.traefik-dashboard-http.entrypoints: http
-      traefik.http.routers.traefik-dashboard-http.rule: Host(`${TRAEFIK_DOMAIN?Variable not set}`)
+      traefik.http.routers.traefik-dashboard-http.rule: Host(`traefik.${ROOT_DOMAIN}`)
 
       # HTTPS router configuration
       traefik.http.routers.traefik-dashboard-https.entrypoints: https
-      traefik.http.routers.traefik-dashboard-https.rule: Host(`${TRAEFIK_DOMAIN?Variable not set}`)
+      traefik.http.routers.traefik-dashboard-https.rule: Host(`traefik.${ROOT_DOMAIN}`)
       traefik.http.routers.traefik-dashboard-https.tls: true
       traefik.http.routers.traefik-dashboard-https.tls.certresolver: le
       traefik.http.routers.traefik-dashboard-https.service: api@internal
