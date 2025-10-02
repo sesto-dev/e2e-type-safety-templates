@@ -9,6 +9,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+COPY openapi.json ./
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 RUN apk add --no-cache curl ca-certificates
 RUN corepack enable pnpm && pnpm i --frozen-lockfile
