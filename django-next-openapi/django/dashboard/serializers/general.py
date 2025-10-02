@@ -15,5 +15,5 @@ class UserSerializer(TimestampedModelSerializer):
         model = User
         fields = ("id", "email", "avatar", "name", "phone", "birthday", "is_active",
                   "is_staff", "is_email_verified", "is_phone_verified",
-                  "created_at", "updated_at", "memberships")
+                  "created_at", "updated_at")
         read_only_fields = ("created_at", "updated_at")

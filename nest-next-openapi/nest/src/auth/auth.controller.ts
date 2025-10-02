@@ -193,19 +193,6 @@ export class AuthController {
         avatar: true,
         phone: true,
         is_email_verified: true,
-        memberships: {
-          select: {
-            id: true,
-            role: true,
-            organization: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
       },
     })
 

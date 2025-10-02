@@ -48,16 +48,6 @@ const data = {
   ],
   navGroups: [
     {
-      id: "organization",
-      title: "Organization",
-      icon: IconFolder,
-      items: [
-        { title: "Billing", url: "/admin/organizations/billing", icon: IconCurrencyDollar },
-        { title: "Memberships", url: "/admin/organizations/memberships", icon: IconUsersGroup },
-        { title: "Invitations", url: "/admin/organizations/invitations", icon: IconMailSpark },
-      ],
-    },
-    {
       id: "user",
       title: "Users",
       icon: IconUsers,

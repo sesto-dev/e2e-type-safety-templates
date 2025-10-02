@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import { cookies, headers } from 'next/headers'
-import { User, Membership, Organization } from '@prisma/client'
+import { User } from '@prisma/client'
 import prisma from './prisma'
 
 // Use promisified verify for async/await
@@ -13,12 +13,6 @@ export type JwtPayload = {
   jti?: string
   iat?: number
   exp?: number
-}
-
-export type UserWithMembershipsAndOrganizations = User & {
-  memberships: (Membership & {
-    organization: Organization
-  })[]
 }
 
 // ---------- Basic token helpers ----------
@@ -198,21 +192,14 @@ export async function tryVerifyOrRefresh(): Promise<{
 
 /**
  * Get current user, attempting refresh if access is expired.
- * Returns: { user } or null on unauthenticated.
+ * Returns: { user } or null on unauthenticated.W
  */
-export async function getCurrentUser(): Promise<UserWithMembershipsAndOrganizations | null> {
+export async function getCurrentUser(): Promise<User | null> {
   const verified = await tryVerifyOrRefresh()
   if (!verified) return null
   const userId = verified.payload.sub
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      memberships: {
-        include: {
-          organization: true,
-        },
-      },
-    },
   })
   return user
 }
@@ -220,22 +207,9 @@ export async function getCurrentUser(): Promise<UserWithMembershipsAndOrganizati
 /**
  * requireUser that throws if unauthenticated (use in server actions / server handlers).
  */
-export async function requireUser(): Promise<UserWithMembershipsAndOrganizations> {
+export async function requireUser(): Promise<User> {
   const user = await getCurrentUser()
   if (!user) throw new Error('Unauthorized')
-  return user
-}
-
-export async function requireUserMemberOfThisOrganization(
-  organizationId: string
-) {
-  const user = await requireUser()
-  const isMember = user.memberships.some(
-    (membership) => membership.organization.id === organizationId
-  )
-
-  if (!isMember) throw new Error('Unauthorized')
-
   return user
 }
 

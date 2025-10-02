@@ -41,10 +41,6 @@ class UserViewSet(AuthenticatedViewSet):
     serializer_class = serializers.UserSerializer
     filterset_fields = ["id", "email", "name", "phone", "birthday", "created_at", "updated_at", "organizations__id", "organizations__slug"]
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.prefetch_related("memberships__organization")
-
     def get_object(self):
         # Always operate on the authenticated user for /users/me style endpoints
         return self.request.user

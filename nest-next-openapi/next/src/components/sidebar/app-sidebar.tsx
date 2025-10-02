@@ -40,38 +40,8 @@ import { useRouter } from 'next/navigation'
 // Data definitions
 // ---------------------------------
 const data = {
-  navMain: [
-    { title: 'Dashboard', url: '/admin', icon: IconDashboard },
-    { title: 'Assessments', url: '/admin/assessments', icon: IconListDetails },
-    {
-      title: 'New assessment',
-      url: '/admin/assessments/new',
-      icon: IconFileDescription,
-    },
-  ],
+  navMain: [{ title: 'Dashboard', url: '/admin', icon: IconDashboard }],
   navGroups: [
-    {
-      id: 'organization',
-      title: 'Organization',
-      icon: IconFolder,
-      items: [
-        {
-          title: 'Billing',
-          url: '/admin/organizations/billing',
-          icon: IconCurrencyDollar,
-        },
-        {
-          title: 'Memberships',
-          url: '/admin/organizations/memberships',
-          icon: IconUsersGroup,
-        },
-        {
-          title: 'Invitations',
-          url: '/admin/organizations/invitations',
-          icon: IconMailSpark,
-        },
-      ],
-    },
     {
       id: 'user',
       title: 'Users',

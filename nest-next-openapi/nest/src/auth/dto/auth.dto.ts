@@ -27,17 +27,6 @@ export const UserMeResponseSchema = z.object({
   avatar: z.string().nullable(),
   phone: z.string().nullable(),
   is_email_verified: z.boolean(),
-  memberships: z.array(
-    z.object({
-      id: z.string(),
-      role: z.enum(['admin', 'member']),
-      organization: z.object({
-        id: z.string(),
-        name: z.string(),
-        slug: z.string(),
-      }),
-    })
-  ),
 })
 
 // Success Response Schema

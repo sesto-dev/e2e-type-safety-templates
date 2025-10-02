@@ -6,11 +6,6 @@ from dashboard import models
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters as drf_filters
 
-def user_is_org_admin(user, organization) -> bool:
-    if user.is_superuser:
-        return True
-    return models.Membership.objects.filter(user=user, organization=organization, role__iexact="admin").exists()
-
 class AuthenticatedViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, drf_filters.SearchFilter, drf_filters.OrderingFilter]
