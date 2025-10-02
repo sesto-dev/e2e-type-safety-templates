@@ -33,6 +33,7 @@ import {
   ErrorResponseSchema,
 } from './dto/auth.dto'
 import type { User } from '@prisma/client'
+import { UserResultSchema } from 'src/generated/zod/schemas'
 
 interface ExtendedRequest extends Request {
   user?: Partial<User> | { sub?: string; [k: string]: any } | null
@@ -171,12 +172,19 @@ export class AuthController {
     summary: 'Get current user',
     description: 'Get information about the currently authenticated user',
     tags: ['auth'],
-    response: UserMeResponseSchema,
     responses: [
       {
         status: 200,
         description: 'User information',
-        schema: UserMeResponseSchema,
+        schema: UserResultSchema.pick({
+          id: true,
+          email: true,
+          name: true,
+          birthday: true,
+          avatar: true,
+          phone: true,
+          is_email_verified: true,
+        }),
       },
       { status: 401, description: 'Unauthorized', schema: ErrorResponseSchema },
     ],

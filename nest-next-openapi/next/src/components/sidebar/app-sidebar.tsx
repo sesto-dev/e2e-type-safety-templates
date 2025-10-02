@@ -32,7 +32,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from '~/components/ui/sidebar'
-import type { User } from '@prisma/client'
+import type { User } from '~/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
