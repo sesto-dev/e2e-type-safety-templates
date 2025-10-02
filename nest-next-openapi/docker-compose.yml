@@ -21,8 +21,6 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - default
-    ports:
-      - "5433:5432" # This line exposes Postgres on the VPS public IP
     labels:
       <<: *default-labels
     logging: *default-logging
@@ -68,8 +66,6 @@ services:
       dockerfile: Dockerfile
     container_name: nest-nn-openapi-template
     restart: unless-stopped
-    ports:
-      - 8001:3000
     env_file:
       - .env
     depends_on:
@@ -100,8 +96,6 @@ services:
   redis:
     image: redis:latest
     container_name: redis-nn-openapi-template
-    ports:
-      - 6380:6379
     cpus: 0.5
     mem_limit: 512m
     networks:
