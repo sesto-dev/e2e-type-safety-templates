@@ -33,7 +33,7 @@ import {
   ErrorResponseSchema,
 } from './dto/auth.dto'
 import type { User } from '@prisma/client'
-import { UserResultSchema } from '~/generated/zod/schemas'
+import { UserResultSchema } from '../generated/zod/schemas'
 
 interface ExtendedRequest extends Request {
   user?: Partial<User> | { sub?: string; [k: string]: any } | null
