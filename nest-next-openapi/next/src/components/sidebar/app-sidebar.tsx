@@ -92,7 +92,6 @@ const data = {
       title: 'Support',
       icon: IconUserPentagon,
       items: [
-        { title: 'Tickets', url: '/admin/support/tickets', icon: IconReport },
         { title: 'Contact', url: '/admin/support/contact', icon: CreditCard },
         { title: 'FAQ', url: '/admin/support/faq', icon: IconUsers },
       ],

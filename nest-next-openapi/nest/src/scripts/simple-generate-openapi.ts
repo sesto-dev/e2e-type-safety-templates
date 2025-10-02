@@ -56,8 +56,6 @@ async function generateOpenApi() {
         description: 'Access token stored in HTTP-only cookie',
       })
       .addTag('auth', 'Authentication endpoints')
-      .addTag('assessments', 'Ticket endpoints')
-      .addTag('tickets', 'Ticket endpoints')
       .build()
 
     const document = SwaggerModule.createDocument(app, config, {

@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi:download": "curl -H \"Accept: application/json\" https://$API_DOMAIN/api/openapi.json -o openapi.json",
+    "openapi:download": "curl -H \"Accept: application/json\" https://api.$ROOT_DOMAIN/api/openapi.json -o openapi.json",
     "openapi:generate": "openapi-ts",
-    "openapi": "npm run openapi:download && npm run openapi:generate"
+    "openapi": "pnpm openapi:download && pnpm openapi:generate"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

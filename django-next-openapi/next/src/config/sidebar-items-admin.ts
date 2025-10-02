@@ -1,42 +1,44 @@
-import { NavItem } from "~/types";
+import { NavItem } from '~/types'
 
 export const navItems: NavItem[] = [
   {
-    title: "Admin Panel",
-    url: "/admin",
-    icon: "dashboard",
+    title: 'Home',
+    url: '/admin',
+    icon: 'dashboard',
     isActive: false,
-    shortcut: ["d", "d"],
+    shortcut: ['d', 'd'],
     items: [],
   },
   {
-    title: "Panels",
-    url: "#",
-    icon: "billing",
+    title: 'User Profile',
+    url: '#',
+    icon: 'billing',
     isActive: true,
     items: [
       {
-        title: "Users",
-        url: "/admin/users",
-        icon: "user",
-        shortcut: ["e", "e"],
-        isActive: false,
-        items: [],
+        title: 'Notifications',
+        url: '/admin/user/notifications',
+        icon: 'warning',
+        shortcut: ['m', 'm'],
       },
-    ],
-  },
-  {
-    title: "Support",
-    url: "#",
-    icon: "billing",
-    isActive: false,
-    items: [
       {
-        title: "Tickets",
-        url: "/admin/support/tickets",
-        icon: "warning",
-        shortcut: ["m", "m"],
+        title: 'Referrals',
+        url: '/admin/user/referrals',
+        icon: 'edit',
+        shortcut: ['m', 'm'],
+      },
+      {
+        title: 'Payments',
+        url: '/admin/user/payments',
+        icon: 'edit',
+        shortcut: ['m', 'm'],
+      },
+      {
+        title: 'Edit Profile',
+        url: '/admin/user/edit',
+        icon: 'edit',
+        shortcut: ['m', 'm'],
       },
     ],
   },
-];
+]
