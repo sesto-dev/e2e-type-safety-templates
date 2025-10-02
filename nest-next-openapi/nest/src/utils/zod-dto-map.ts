@@ -11,7 +11,7 @@ import { createZodDto } from '@anatine/zod-nestjs'
 import * as zodGenerated from '../generated/zod/schemas' // adjust path
 
 // Example: pick the schemas you need
-export const UserZ = zodGenerated.TicketModelSchema
+export const UserZ = zodGenerated.UserModelSchema
 
 export const UserDto = createZodDto(UserZ)
 
