@@ -40,6 +40,16 @@ interface ExtendedRequest extends Request {
   session: any
 }
 
+const PublicUserSchema = UserResultSchema.pick({
+  id: true,
+  email: true,
+  name: true,
+  birthday: true,
+  avatar: true,
+  phone: true,
+  is_email_verified: true,
+}).openapi({ title: 'PublicUser' }) // <-- gives a proper component name
+
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name)
@@ -176,15 +186,7 @@ export class AuthController {
       {
         status: 200,
         description: 'User information',
-        schema: UserResultSchema.pick({
-          id: true,
-          email: true,
-          name: true,
-          birthday: true,
-          avatar: true,
-          phone: true,
-          is_email_verified: true,
-        }),
+        schema: PublicUserSchema,
       },
       { status: 401, description: 'Unauthorized', schema: ErrorResponseSchema },
     ],
