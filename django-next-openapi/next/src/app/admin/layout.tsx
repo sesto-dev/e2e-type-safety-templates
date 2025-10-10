@@ -4,7 +4,6 @@ import { SiteHeader } from "~/components/site-header";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 import getCurrentUser from "~/lib/server/current-user";
 import { redirect } from "next/navigation";
-import { OrganizationsProvider } from "~/context/organization";
 
 export default async function Page({
   children,
@@ -15,7 +14,6 @@ export default async function Page({
   if (!user) redirect("/login");
 
   return (
-    <OrganizationsProvider>
       <SidebarProvider
         style={
           {
@@ -34,6 +32,5 @@ export default async function Page({
           </div>
         </SidebarInset>
       </SidebarProvider>
-    </OrganizationsProvider>
   );
 }

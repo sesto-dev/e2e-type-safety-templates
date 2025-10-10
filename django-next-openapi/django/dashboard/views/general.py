@@ -23,10 +23,6 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 def get_by_query_or_400(request, model, param_map: dict):
-    """
-    param_map: mapping of query param name -> model field lookup (e.g. {"user": "user_id", "organization": "organization_id"})
-    Raises ValidationError if missing params, returns object via get_object_or_404.
-    """
     kwargs = {}
     for qparam, lookup in param_map.items():
         val = request.query_params.get(qparam)
@@ -39,7 +35,7 @@ def get_by_query_or_400(request, model, param_map: dict):
 class UserViewSet(AuthenticatedViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    filterset_fields = ["id", "email", "name", "phone", "birthday", "created_at", "updated_at", "organizations__id", "organizations__slug"]
+    filterset_fields = ["id", "email", "name", "phone", "birthday", "created_at", "updated_at"]
 
     def get_object(self):
         # Always operate on the authenticated user for /users/me style endpoints
