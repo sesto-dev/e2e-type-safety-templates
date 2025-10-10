@@ -35,7 +35,6 @@ import {
 import type { CurrentUser } from "~/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { TeamSwitcher } from "./team-switcher";
 
 // ---------------------------------
 // Data definitions
@@ -152,7 +151,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter>
-        <TeamSwitcher />
         <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
