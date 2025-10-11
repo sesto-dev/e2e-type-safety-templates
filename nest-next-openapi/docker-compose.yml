@@ -40,12 +40,12 @@ services:
       traefik.enable: true
       traefik.docker.network: traefik-public
 
-      traefik.http.routers.frontend-nn-openapi-template-client-http.rule: Host(`client.${ROOT_DOMAIN}`)
+      traefik.http.routers.frontend-nn-openapi-template-client-http.rule: Host(`app.${ROOT_DOMAIN}`)
       traefik.http.routers.frontend-nn-openapi-template-client-http.entrypoints: http
       traefik.http.routers.frontend-nn-openapi-template-client-http.middlewares: https-redirect
       traefik.http.routers.frontend-nn-openapi-template-client-http.service: frontend-nn-openapi-template-client-service
 
-      traefik.http.routers.frontend-nn-openapi-template-client-https.rule: Host(`client.${ROOT_DOMAIN}`)
+      traefik.http.routers.frontend-nn-openapi-template-client-https.rule: Host(`app.${ROOT_DOMAIN}`)
       traefik.http.routers.frontend-nn-openapi-template-client-https.entrypoints: https
       traefik.http.routers.frontend-nn-openapi-template-client-https.tls: true
       traefik.http.routers.frontend-nn-openapi-template-client-https.tls.certresolver: le

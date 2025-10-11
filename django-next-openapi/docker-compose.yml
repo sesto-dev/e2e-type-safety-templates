@@ -40,12 +40,12 @@ services:
       traefik.enable: true
       traefik.docker.network: traefik-public
 
-      traefik.http.routers.frontend-dn-openapi-template-client-http.rule: Host(`client.${ROOT_DOMAIN}`)
+      traefik.http.routers.frontend-dn-openapi-template-client-http.rule: Host(`app.django-next.${ROOT_DOMAIN}`)
       traefik.http.routers.frontend-dn-openapi-template-client-http.entrypoints: http
       traefik.http.routers.frontend-dn-openapi-template-client-http.middlewares: https-redirect
       traefik.http.routers.frontend-dn-openapi-template-client-http.service: frontend-dn-openapi-template-client-service
 
-      traefik.http.routers.frontend-dn-openapi-template-client-https.rule: Host(`client.${ROOT_DOMAIN}`)
+      traefik.http.routers.frontend-dn-openapi-template-client-https.rule: Host(`app.django-next.${ROOT_DOMAIN}`)
       traefik.http.routers.frontend-dn-openapi-template-client-https.entrypoints: https
       traefik.http.routers.frontend-dn-openapi-template-client-https.tls: true
       traefik.http.routers.frontend-dn-openapi-template-client-https.tls.certresolver: le
@@ -82,12 +82,12 @@ services:
       traefik.enable: true
       traefik.docker.network: traefik-public
 
-      traefik.http.routers.django-dn-openapi-template-http.rule: Host(`api.${ROOT_DOMAIN}`)
+      traefik.http.routers.django-dn-openapi-template-http.rule: Host(`api.django-next.${ROOT_DOMAIN}`)
       traefik.http.routers.django-dn-openapi-template-http.entrypoints: http
       traefik.http.routers.django-dn-openapi-template-http.middlewares: https-redirect
       traefik.http.routers.django-dn-openapi-template-http.service: django-dn-openapi-template-service
 
-      traefik.http.routers.django-dn-openapi-template-https.rule: Host(`api.${ROOT_DOMAIN}`)
+      traefik.http.routers.django-dn-openapi-template-https.rule: Host(`api.django-next.${ROOT_DOMAIN}`)
       traefik.http.routers.django-dn-openapi-template-https.entrypoints: https
       traefik.http.routers.django-dn-openapi-template-https.tls: true
       traefik.http.routers.django-dn-openapi-template-https.tls.certresolver: le
@@ -95,7 +95,7 @@ services:
 
       traefik.http.services.django-dn-openapi-template-service.loadbalancer.server.port: 8000
 
-      traefik.http.routers.django-static.rule: Host(`api.${ROOT_DOMAIN}`) && PathPrefix(`/static/`)
+      traefik.http.routers.django-static.rule: Host(`api.django-next.${ROOT_DOMAIN}`) && PathPrefix(`/static/`)
       traefik.http.routers.django-static.service: django-dn-openapi-template-service
       traefik.http.middlewares.static-stripprefix.stripprefix.prefixes: /static
       traefik.http.routers.django-static.middlewares: static-stripprefix@docker

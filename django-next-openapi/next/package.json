@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "pnpm openapi:generate && next dev --turbopack",
-    "build": "next build",
+    "build": "pnpm openapi:generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi:download": "curl -H \"Accept: application/json\" https://$API_DOMAIN/api/openapi.json -o openapi.json",
+    "openapi:download": "node ./scripts/download-openapi.js",
     "openapi:generate": "openapi-ts",
     "openapi": "pnpm openapi:download && pnpm openapi:generate"
   },
