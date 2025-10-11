@@ -13,11 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(strtobool(os.getenv("DJANGO_DEBUG", "False")))
 
-ALLOWED_HOSTS = [os.getenv('API_DOMAIN'), os.getenv('NEXT_DOMAIN'), os.getenv('SERVER_IP'),'django', 'localhost']
+ROOT_DOMAIN = os.getenv('ROOT_DOMAIN')
+ALLOWED_HOSTS = [f'api.django-next.{ROOT_DOMAIN}', os.getenv('NEXT_DOMAIN'), os.getenv('SERVER_IP'),'django', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{os.getenv('API_DOMAIN')}",
-    f"http://{os.getenv('API_DOMAIN')}",
+    f"https://{f'api.django-next.{ROOT_DOMAIN}'}",
+    f"http://{f'api.django-next.{ROOT_DOMAIN}'}",
     f"https://{os.getenv('SERVER_IP')}",
     f"http://{os.getenv('SERVER_IP')}",
     f"https://{os.getenv('COOKIE_DOMAIN')}",
@@ -30,7 +31,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True  # Allow sending authentication cookies
 
 CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_DOMAIN = os.getenv('API_DOMAIN')
+CSRF_COOKIE_DOMAIN = f'api.django-next.{ROOT_DOMAIN}'
 SESSION_COOKIE_SECURE = True
 
 LOGGING = {

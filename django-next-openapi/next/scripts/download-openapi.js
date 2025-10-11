@@ -4,13 +4,13 @@ const path = require('path')
 const https = require('https')
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') })
 
-const ROOT_DOMAIN = process.env.ROOT_DOMAIN
-if (!ROOT_DOMAIN) {
-  console.error('ERROR: ROOT_DOMAIN not set. Check .env or environment.')
+const NEXT_PUBLIC_API_BASEURL = process.env.NEXT_PUBLIC_API_BASEURL
+if (!NEXT_PUBLIC_API_BASEURL) {
+  console.error('ERROR: NEXT_PUBLIC_API_BASEURL not set. Check .env or environment.')
   process.exit(2)
 }
 
-const url = `https://api.${ROOT_DOMAIN}/api/openapi.json`
+const url = `${NEXT_PUBLIC_API_BASEURL}/api/openapi.json`
 const outPath = path.resolve(process.cwd(), 'openapi.json')
 
 console.log('Downloading', url)
