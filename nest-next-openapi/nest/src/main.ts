@@ -58,7 +58,7 @@ async function bootstrap() {
         // but sameSite:'none' requires secure:true. So use 'lax' in dev and 'none' in prod.
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         // Optional: only set domain if provided. Don't set it in dev (localhost) or you'll break cookie matching.
-        domain: process.env.COOKIE_DOMAIN || undefined,
+        domain: `.${process.env.ROOT_DOMAIN}` || undefined,
         maxAge: parseInt(
           process.env.SESSION_MAX_AGE || `${1000 * 60 * 60 * 24}`,
           10

@@ -40,6 +40,8 @@ interface ExtendedRequest extends Request {
   session: any
 }
 
+const CookieDomain = `.${process.env.ROOT_DOMAIN}`
+
 const PublicUserSchema = UserResultSchema.pick({
   id: true,
   email: true,
@@ -112,12 +114,12 @@ export class AuthController {
     const tokens = await this.auth.verifyOtp(
       dto.email,
       dto.code,
-      process.env.COOKIE_DOMAIN,
+      CookieDomain,
       ip,
       ua
     )
     setAuthCookies(res, tokens.accessToken, tokens.refreshToken, {
-      cookieDomain: process.env.COOKIE_DOMAIN,
+      cookieDomain: CookieDomain,
       accessTtlSeconds: tokens.accessTtlSeconds,
       refreshTtlSeconds: tokens.refreshTtlSeconds,
       secure: process.env.NODE_ENV === 'production',
@@ -144,11 +146,11 @@ export class AuthController {
     const refreshToken = req.cookies?.refresh_token
     await this.auth.logout(refreshToken)
     res.clearCookie('access_token', {
-      domain: process.env.COOKIE_DOMAIN,
+      domain: CookieDomain,
       path: '/',
     })
     res.clearCookie('refresh_token', {
-      domain: process.env.COOKIE_DOMAIN,
+      domain: CookieDomain,
       path: '/',
     })
     return res
@@ -168,7 +170,7 @@ export class AuthController {
 
     const tokens = await this.auth.rotateRefreshToken(oldRefresh)
     setAuthCookies(res, tokens.accessToken, tokens.refreshToken, {
-      cookieDomain: process.env.COOKIE_DOMAIN,
+      cookieDomain: CookieDomain,
       accessTtlSeconds: tokens.accessTtlSeconds,
       refreshTtlSeconds: tokens.refreshTtlSeconds,
       secure: process.env.NODE_ENV === 'production',
@@ -352,7 +354,7 @@ export class AuthController {
 
       // Set auth cookies
       setAuthCookies(res, tokens.accessToken, tokens.refreshToken, {
-        cookieDomain: process.env.COOKIE_DOMAIN,
+        cookieDomain: CookieDomain,
         accessTtlSeconds: tokens.accessTtlSeconds,
         refreshTtlSeconds: tokens.refreshTtlSeconds,
         secure: process.env.NODE_ENV === 'production',

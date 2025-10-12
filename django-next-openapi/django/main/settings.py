@@ -21,8 +21,6 @@ CSRF_TRUSTED_ORIGINS = [
     f"http://{f'api.django-next.{ROOT_DOMAIN}'}",
     f"https://{os.getenv('SERVER_IP')}",
     f"http://{os.getenv('SERVER_IP')}",
-    f"https://{os.getenv('COOKIE_DOMAIN')}",
-    f"http://{os.getenv('COOKIE_DOMAIN')}",
     f"https://{os.getenv('NEXT_DOMAIN')}",
     f"http://{os.getenv('NEXT_DOMAIN')}",
 ]
@@ -134,7 +132,7 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 GOOGLE_REDIRECT_DASHBOARD_URI = os.getenv("GOOGLE_REDIRECT_DASHBOARD_URI")
-COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
+COOKIE_DOMAIN = f'.{os.getenv("ROOT_DOMAIN")}'
 NEXT_DOMAIN = os.getenv("NEXT_DOMAIN")
 
 STRIPE_SECRET_KEY = os.getenv('STRIPE_TEST_SECRET_KEY', default=None)
