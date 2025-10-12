@@ -21,12 +21,13 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from django.contrib.auth import authenticate
 
 from dashboard.tasks import send_celery_email
 from dashboard.models import User
 from access.serializers import (
-    OTPRequestSerializer,
-    OTPVerifySerializer,
+    LoginSerializer,
+    RegisterSerializer,
     LogoutSerializer,
     TokenRefreshSerializer,
     CurrentUserSerializer
@@ -52,6 +53,7 @@ def set_auth_cookies(response, refresh, domain):
         samesite="Lax",
         expires=access_expires,
         domain=domain,
+        path='/',
     )
     response.set_cookie(
         key="refresh_token",
@@ -61,70 +63,52 @@ def set_auth_cookies(response, refresh, domain):
         samesite="Lax",
         expires=refresh_expires,
         domain=domain,
+        path='/',
     )
     return response
 
 # ---------------------------------------------------------------------
-# 1. OTP Request Endpoint
-class OTPRequestView(CreateAPIView):
+# Register Endpoint (optional but useful for creating accounts)
+class RegisterView(CreateAPIView):
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
-    serializer_class = OTPRequestSerializer
+    serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-
-        user, _ = User.objects.get_or_create(email=email)
-        otp = ''.join(secrets.choice(string.digits) for _ in range(6))
-        user.otp = otp
-        user.save()
-
-        send_celery_email(
-            subject="Your OTP Code",
-            plain_text=f"Your OTP code is: {otp}. Visit {settings.GOOGLE_REDIRECT_DASHBOARD_URI} to access the dashboard.",
-            candidate_email=email,
-        )
-        return Response({"detail": "OTP sent"}, status=status.HTTP_200_OK)
+        user = serializer.save()
+        return Response({"detail": "User created"}, status=status.HTTP_201_CREATED)
 
 # ---------------------------------------------------------------------
-# 2. OTP Verify Endpoint
-class OTPVerifyView(GenericAPIView):
+# Login Endpoint (username + password)
+class LoginView(GenericAPIView):
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
-    serializer_class = OTPVerifySerializer
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        code = serializer.validated_data['code']
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            logger.warning("OTP verify failed: user not found for email %s", email)
-            return Response({"detail": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if user.otp != code:
-            logger.warning("OTP verify failed: invalid OTP for email %s", email)
-            return Response({"detail": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Clear OTP and mark as verified
-        user.otp = ""
-        user.is_email_verified = True
-        user.save()
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            logger.warning("Login failed for username %s", username)
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user.is_active:
+            return Response({"detail": "User is inactive"}, status=status.HTTP_403_FORBIDDEN)
 
         # Generate JWT tokens using SimpleJWT.
         refresh = RefreshToken.for_user(user)
-        response = Response({"detail": "OTP verified"}, status=status.HTTP_200_OK)
+        response = Response({"detail": "Login successful"}, status=status.HTTP_200_OK)
         set_auth_cookies(response, refresh, HTTP_COOKIE_SUBDOMAIN)
-        logger.info("Set HttpOnly cookies for user %s", user.email)
+        logger.info("Set HttpOnly cookies for user %s", user.username)
         return response
 
 # ---------------------------------------------------------------------
-# 3. Logout Endpoint
+# Logout Endpoint (unchanged)
 class LogoutView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -144,7 +128,7 @@ class LogoutView(GenericAPIView):
         return response
 
 # ---------------------------------------------------------------------
-# 4. Token Refresh Endpoint
+# Token Refresh Endpoint (unchanged; uses cookie-based refresh)
 class TokenRefreshView(GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = TokenRefreshSerializer
@@ -185,7 +169,7 @@ class TokenRefreshView(GenericAPIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
 # ---------------------------------------------------------------------
-# 5. Current User Endpoint
+# Current User Endpoint
 class CurrentUserView(RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CurrentUserSerializer
@@ -193,126 +177,3 @@ class CurrentUserView(RetrieveAPIView):
     def get_object(self):
         logger.debug("Incoming cookies: %s", self.request.COOKIES)
         return self.request.user
-
-# ---------------------------------------------------------------------
-# Google OAuth: Initiation and Callback
-class GoogleAuthInitView(GenericAPIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request, *args, **kwargs):
-        # Generate a random state and code verifier.
-        state = secrets.token_urlsafe(32)
-        code_verifier = secrets.token_urlsafe(64)
-        # Save these values in the session for later validation.
-        request.session['google_oauth_state'] = state
-        request.session['google_code_verifier'] = code_verifier
-
-        # Compute the code challenge as base64url( SHA256(code_verifier) )
-        code_challenge = base64.urlsafe_b64encode(
-            hashlib.sha256(code_verifier.encode()).digest()
-        ).rstrip(b'=').decode('ascii')
-
-        client_id = settings.GOOGLE_CLIENT_ID
-        redirect_uri = settings.GOOGLE_REDIRECT_URI  # e.g. "https://yourdomain.com/api/auth/google/callback/"
-        scope = "openid email profile"
-        auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
-        params = {
-            "response_type": "code",
-            "client_id": client_id,
-            "redirect_uri": redirect_uri,
-            "scope": scope,
-            "state": state,
-            "code_challenge": code_challenge,
-            "code_challenge_method": "S256",
-        }
-        url = auth_url + "?" + urlencode(params)
-        return redirect(url)
-
-class GoogleAuthCallbackView(GenericAPIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request, *args, **kwargs):
-        # Retrieve parameters from the query string.
-        code = request.GET.get("code")
-        state = request.GET.get("state")
-        if not code or not state:
-            return Response({"detail": "Missing code or state"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate state against what was stored in the session.
-        stored_state = request.session.get('google_oauth_state')
-        code_verifier = request.session.get('google_code_verifier')
-        if state != stored_state:
-            return Response({"detail": "Invalid state parameter"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Exchange the authorization code for tokens.
-        token_url = "https://oauth2.googleapis.com/token"
-        client_id = settings.GOOGLE_CLIENT_ID
-        client_secret = settings.GOOGLE_CLIENT_SECRET
-        redirect_uri = settings.GOOGLE_REDIRECT_URI
-        data = {
-            "code": code,
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uri": redirect_uri,
-            "grant_type": "authorization_code",
-            "code_verifier": code_verifier,
-        }
-        token_response = requests.post(token_url, data=data)
-        if token_response.status_code != 200:
-            return Response({"detail": "Failed to obtain tokens from Google"}, status=status.HTTP_400_BAD_REQUEST)
-        token_data = token_response.json()
-        id_token_str = token_data.get("id_token")
-        if not id_token_str:
-            return Response({"detail": "Missing id_token in token response"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify the id_token using Google's public keys.
-        try:
-            req = google_requests.Request()
-            id_info = id_token.verify_oauth2_token(id_token_str, req, client_id)
-        except Exception as e:
-            # Log the exception details for debugging purposes.
-            logger.error(f"Failed to verify id token: {e}")
-            return Response({"detail": "Failed to verify id token"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Extract user information from the id token.
-        email = id_info.get("email")
-        name = id_info.get("name")
-        avatar = id_info.get("picture")
-        if not email:
-            return Response({"detail": "Email not available in token"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Get or create the user in your database.
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "name": name or "",
-                "avatar": avatar or "",
-                "is_email_verified": True,
-            }
-        )
-        if not created:
-            # Update only if the fields are empty.
-            if not user.name and name:
-                user.name = name
-            if not user.avatar and avatar:
-                user.avatar = avatar
-            # You can still mark the email as verified if needed.
-            user.is_email_verified = True
-            user.save()
-
-        # Generate JWT tokens using SimpleJWT.
-        refresh = RefreshToken.for_user(user)
-        
-        # Determine the Next.js dashboard URL from settings or fallback.
-        dashboard_url = getattr(settings, "GOOGLE_REDIRECT_DASHBOARD_URI")
-        response = HttpResponseRedirect(dashboard_url)
-        set_auth_cookies(response, refresh, HTTP_COOKIE_SUBDOMAIN)
-
-        # Clean up session variables.
-        try:
-            del request.session['google_oauth_state']
-            del request.session['google_code_verifier']
-        except KeyError:
-            pass
-
-        return response

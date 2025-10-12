@@ -1,30 +1,33 @@
 # access/serializers.py
 from django.contrib.auth.models import Group
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
-from dashboard.models import User
+User = get_user_model()
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
 
-class OTPRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-        help_text="The email address to which the OTP will be sent."
-    )
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True, help_text="The user's username.")
+    password = serializers.CharField(required=True, write_only=True, help_text="The user's password.")
 
-class OTPVerifySerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-        help_text="The user's email address."
-    )
-    code = serializers.CharField(
-        required=True,
-        max_length=6,
-        help_text="The 6-digit OTP code received by email."
-    )
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password', 'name')
+
+    def create(self, validated_data):
+        username = validated_data.get('username')
+        email = validated_data.get('email')
+        password = validated_data.get('password')
+        name = validated_data.get('name', '')
+        user = User.objects.create_user(username=username, email=email, password=password, name=name)
+        return user
 
 class LogoutSerializer(serializers.Serializer):
     refresh_token = serializers.CharField(
@@ -40,5 +43,5 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'birthday', 'avatar', 'phone', 'groups', 'is_email_verified')
+        fields = ('id', 'username', 'email', 'name', 'birthday', 'avatar', 'phone', 'groups', 'is_email_verified')
         read_only_fields = fields

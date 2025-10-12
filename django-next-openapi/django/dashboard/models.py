@@ -34,11 +34,12 @@ def generate_short_hex() -> str:
 # Custom user
 # ------------------------------------------------------------------
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError("The Email field must be set.")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        if not username:
+            raise ValueError("The Username field must be set.")
+        email = self.normalize_email(email) if email else None
+        username = username.strip()
+        user = self.model(username=username, email=email, **extra_fields)
         if password:
             user.set_password(password)
         else:
@@ -46,7 +47,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -55,10 +56,13 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(username, email=email, password=password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    # New required username field used for authentication
+    username = models.CharField(max_length=150, unique=True, blank=False)
+
     email = models.EmailField(unique=True, blank=False)
     phone = models.CharField(max_length=50, unique=True, null=True, blank=True)
     avatar = models.URLField(null=True, blank=True)
@@ -85,8 +89,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    USERNAME_FIELD = "email"
+    # Use username for authentication now
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
+
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email or str(self.id)
+        return self.username or self.email or str(self.id)
