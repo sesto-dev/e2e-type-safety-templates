@@ -6,132 +6,47 @@
         "description": "Detailed API documentation for the project"
     },
     "paths": {
-        "/api/auth/google/": {
-            "get": {
-                "operationId": "api_auth_google_retrieve",
+        "/api/auth/login/": {
+            "post": {
+                "operationId": "api_auth_login_create",
                 "tags": [
                     "api"
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "security": [
-                    {
-                        "jwtAuth": []
-                    },
-                    {
-                        "cookieAuth": []
-                    },
                     {}
                 ],
                 "responses": {
                     "200": {
-                        "description": "No response body"
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Login"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
-                },
-                "parameters": [
-                    {
-                        "name": "created_at__gte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by created_at gte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "created_at__lte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by created_at lte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "updated_at__gte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by updated_at gte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "updated_at__lte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by updated_at lte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    }
-                ]
-            }
-        },
-        "/api/auth/google/callback/": {
-            "get": {
-                "operationId": "api_auth_google_callback_retrieve",
-                "tags": [
-                    "api"
-                ],
-                "security": [
-                    {
-                        "jwtAuth": []
-                    },
-                    {
-                        "cookieAuth": []
-                    },
-                    {}
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response body"
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "created_at__gte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by created_at gte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "created_at__lte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by created_at lte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "updated_at__gte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by updated_at gte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    },
-                    {
-                        "name": "updated_at__lte",
-                        "in": "query",
-                        "required": false,
-                        "description": "Filter by updated_at lte (ISO-8601 date/time, e.g. 2024-01-01T00:00:00Z)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    }
-                ]
+                }
             }
         },
         "/api/auth/logout/": {
@@ -225,9 +140,9 @@
                 ]
             }
         },
-        "/api/auth/otp/send/": {
+        "/api/auth/register/": {
             "post": {
-                "operationId": "api_auth_otp_send_create",
+                "operationId": "api_auth_register_create",
                 "tags": [
                     "api"
                 ],
@@ -235,17 +150,17 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OTPRequestRequest"
+                                "$ref": "#/components/schemas/RegisterRequest"
                             }
                         },
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "$ref": "#/components/schemas/OTPRequestRequest"
+                                "$ref": "#/components/schemas/RegisterRequest"
                             }
                         },
                         "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/OTPRequestRequest"
+                                "$ref": "#/components/schemas/RegisterRequest"
                             }
                         }
                     },
@@ -259,50 +174,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/OTPRequest"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/auth/otp/verify/": {
-            "post": {
-                "operationId": "api_auth_otp_verify_create",
-                "tags": [
-                    "api"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OTPVerifyRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OTPVerifyRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OTPVerifyRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "security": [
-                    {}
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OTPVerify"
+                                    "$ref": "#/components/schemas/Register"
                                 }
                             }
                         },
@@ -968,6 +840,10 @@
                         "type": "integer",
                         "readOnly": true
                     },
+                    "username": {
+                        "type": "string",
+                        "readOnly": true
+                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -1015,7 +891,8 @@
                     "id",
                     "is_email_verified",
                     "name",
-                    "phone"
+                    "phone",
+                    "username"
                 ]
             },
             "Group": {
@@ -1035,71 +912,36 @@
                     "name"
                 ]
             },
-            "OTPRequest": {
+            "Login": {
                 "type": "object",
                 "properties": {
-                    "email": {
+                    "username": {
                         "type": "string",
-                        "format": "email",
-                        "description": "The email address to which the OTP will be sent."
+                        "description": "The user's username."
                     }
                 },
                 "required": [
-                    "email"
+                    "username"
                 ]
             },
-            "OTPRequestRequest": {
+            "LoginRequest": {
                 "type": "object",
                 "properties": {
-                    "email": {
+                    "username": {
                         "type": "string",
-                        "format": "email",
                         "minLength": 1,
-                        "description": "The email address to which the OTP will be sent."
-                    }
-                },
-                "required": [
-                    "email"
-                ]
-            },
-            "OTPVerify": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "description": "The user's email address."
+                        "description": "The user's username."
                     },
-                    "code": {
+                    "password": {
                         "type": "string",
-                        "description": "The 6-digit OTP code received by email.",
-                        "maxLength": 6
+                        "writeOnly": true,
+                        "minLength": 1,
+                        "description": "The user's password."
                     }
                 },
                 "required": [
-                    "code",
-                    "email"
-                ]
-            },
-            "OTPVerifyRequest": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "minLength": 1,
-                        "description": "The user's email address."
-                    },
-                    "code": {
-                        "type": "string",
-                        "minLength": 1,
-                        "description": "The 6-digit OTP code received by email.",
-                        "maxLength": 6
-                    }
-                },
-                "required": [
-                    "code",
-                    "email"
+                    "password",
+                    "username"
                 ]
             },
             "PaginatedUserList": {
@@ -1177,6 +1019,60 @@
                         "type": "boolean"
                     }
                 }
+            },
+            "Register": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email",
+                    "username"
+                ]
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 150
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1,
+                        "maxLength": 254
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "minLength": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email",
+                    "password",
+                    "username"
+                ]
             },
             "User": {
                 "type": "object",

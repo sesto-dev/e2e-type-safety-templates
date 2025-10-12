@@ -31,7 +31,7 @@ export default async function SignInViewPage() {
               Sign in to your account
             </h1>
             <p className="text-sm text-muted-foreground">
-              Sign in with your username and password. If you don't have an
+              Sign in with your email and password. If you don't have an
               account, switch to Register below to create one.
             </p>
           </div>

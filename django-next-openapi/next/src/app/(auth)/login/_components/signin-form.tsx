@@ -15,14 +15,14 @@ import { toast } from "sonner";
 
 // Validation schemas
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  email: z.string().email("Please enter a valid email address."),
   password: z.string().min(1, "Password is required"),
 });
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().optional(),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -33,7 +33,6 @@ export default function SignInForm() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Two separate forms (login / register) using react-hook-form
   const {
     register: loginRegister,
     handleSubmit: handleLoginSubmit,
@@ -53,9 +52,7 @@ export default function SignInForm() {
     try {
       const res = await fetch(`${baseUrl}/api/auth/login/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
@@ -66,7 +63,6 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      // Redirect to admin/dashboard (match your routing)
       router.push("/admin");
     } catch (err: any) {
       console.error("Login error:", err);
@@ -81,9 +77,7 @@ export default function SignInForm() {
     try {
       const res = await fetch(`${baseUrl}/api/auth/register/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
@@ -94,7 +88,6 @@ export default function SignInForm() {
       }
 
       toast.success("Account created — you are now signed in");
-      // After register, backend may or may not set cookies; if it does, redirect.
       router.push("/admin");
     } catch (err: any) {
       console.error("Register error:", err);
@@ -130,19 +123,19 @@ export default function SignInForm() {
               </button>
             </div>
             <div className="text-sm text-muted-foreground">
-              {mode === "login" ? "Use your username & password" : "Create a new account"}
+              {mode === "login" ? "Use your email & password" : "Create a new account"}
             </div>
           </div>
 
           {mode === "login" ? (
             <form onSubmit={handleLoginSubmit(submitLogin)} className="flex flex-col gap-3">
               <div>
-                <Label className="sr-only" htmlFor="username">
-                  Username
+                <Label className="sr-only" htmlFor="email">
+                  Email
                 </Label>
-                <Input id="username" placeholder="username" {...loginRegister("username")} />
-                {loginErrors?.username && (
-                  <p className="mt-2 text-xs text-destructive">{loginErrors.username.message}</p>
+                <Input id="email" placeholder="name@example.com" {...loginRegister("email")} />
+                {loginErrors?.email && (
+                  <p className="mt-2 text-xs text-destructive">{loginErrors.email.message}</p>
                 )}
               </div>
 
@@ -163,22 +156,22 @@ export default function SignInForm() {
           ) : (
             <form onSubmit={handleRegisterSubmit(submitRegister)} className="flex flex-col gap-3">
               <div>
-                <Label className="sr-only" htmlFor="username">
-                  Username
-                </Label>
-                <Input id="username" placeholder="username" {...registerRegister("username")} />
-                {registerErrors?.username && (
-                  <p className="mt-2 text-xs text-destructive">{registerErrors.username.message}</p>
-                )}
-              </div>
-
-              <div>
                 <Label className="sr-only" htmlFor="email">
                   Email
                 </Label>
                 <Input id="email" placeholder="name@example.com" {...registerRegister("email")} />
                 {registerErrors?.email && (
                   <p className="mt-2 text-xs text-destructive">{registerErrors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label className="sr-only" htmlFor="name">
+                  Name (optional)
+                </Label>
+                <Input id="name" placeholder="Full name (optional)" {...registerRegister("name")} />
+                {registerErrors?.name && (
+                  <p className="mt-2 text-xs text-destructive">{registerErrors.name.message}</p>
                 )}
               </div>
 

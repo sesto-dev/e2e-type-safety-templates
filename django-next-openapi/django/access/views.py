@@ -1,29 +1,13 @@
-# access/views.py
-import os
-import secrets
-import logging
-import hashlib
-import base64
-import requests
-import random, string
-
+# access/views.py (relevant sections)
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from urllib.parse import urlencode
-
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
-
-from django.conf import settings
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect
-from django.utils import timezone
 from django.contrib.auth import authenticate
+from django.conf import settings
+from django.utils import timezone
+import logging
 
-from dashboard.tasks import send_celery_email
 from dashboard.models import User
 from access.serializers import (
     LoginSerializer,
@@ -34,15 +18,9 @@ from access.serializers import (
 )
 
 logger = logging.getLogger(__name__)
-
 HTTP_COOKIE_SUBDOMAIN = settings.COOKIE_DOMAIN
 
-# ---------------------------------------------------------------------
-# Helper function to set authentication cookies in the response.
 def set_auth_cookies(response, refresh, domain):
-    logger.info(f"setting httpOnly cookies for {domain}")
-    print(f"setting httpOnly cookies for {domain}")
-
     access_expires = timezone.now() + settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
     refresh_expires = timezone.now() + settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
     response.set_cookie(
@@ -67,8 +45,6 @@ def set_auth_cookies(response, refresh, domain):
     )
     return response
 
-# ---------------------------------------------------------------------
-# Register Endpoint (optional but useful for creating accounts)
 class RegisterView(CreateAPIView):
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
@@ -78,10 +54,12 @@ class RegisterView(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        return Response({"detail": "User created"}, status=status.HTTP_201_CREATED)
+        # Optionally auto-login: issue tokens and set cookies
+        refresh = RefreshToken.for_user(user)
+        response = Response({"detail": "User created"}, status=status.HTTP_201_CREATED)
+        set_auth_cookies(response, refresh, HTTP_COOKIE_SUBDOMAIN)
+        return response
 
-# ---------------------------------------------------------------------
-# Login Endpoint (username + password)
 class LoginView(GenericAPIView):
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
@@ -90,22 +68,22 @@ class LoginView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']
+        email = serializer.validated_data['email']
         password = serializer.validated_data['password']
 
-        user = authenticate(request, username=username, password=password)
+        # authenticate uses the model's USERNAME_FIELD; pass email as username
+        user = authenticate(request, username=email, password=password)
         if user is None:
-            logger.warning("Login failed for username %s", username)
+            logger.warning("Login failed for email %s", email)
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         if not user.is_active:
             return Response({"detail": "User is inactive"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Generate JWT tokens using SimpleJWT.
         refresh = RefreshToken.for_user(user)
         response = Response({"detail": "Login successful"}, status=status.HTTP_200_OK)
         set_auth_cookies(response, refresh, HTTP_COOKIE_SUBDOMAIN)
-        logger.info("Set HttpOnly cookies for user %s", user.username)
         return response
+
 
 # ---------------------------------------------------------------------
 # Logout Endpoint (unchanged)
