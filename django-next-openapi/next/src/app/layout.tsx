@@ -70,10 +70,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headersObj = await headers()
-  const pathname = headersObj.get("x-invoke-path") || "";
-  const user = await getCurrentUser();
-  if (!user && !pathname.startsWith("/login")) redirect("/login");
   
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning={true}>

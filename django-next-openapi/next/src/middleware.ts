@@ -1,6 +1,24 @@
-import { type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {}
+export function middleware(req: NextRequest) {
+  const isAuthRoute = req.nextUrl.pathname.startsWith("/login");
+  const token = req.cookies.get("sessionid")?.value; // adjust cookie name for Django session
+
+  // If not logged in and trying to access a protected page
+  if (!token && !isAuthRoute) {
+    const loginUrl = new URL("/login", req.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // If logged in and trying to access login page
+  if (token && isAuthRoute) {
+    const homeUrl = new URL("/", req.url);
+    return NextResponse.redirect(homeUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
