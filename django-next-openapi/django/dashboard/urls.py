@@ -10,6 +10,6 @@ router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path("api/todos/", TodoListCreateView.as_view(), name="todo-list-create"),
-    path("api/todos/<uuid:id>/", TodoRetrieveUpdateDestroyView.as_view(), name="todo-detail"),
+    path("todos/", TodoListCreateView.as_view(), name="todo-list-create"),
+    path("todos/<uuid:id>/", TodoRetrieveUpdateDestroyView.as_view(), name="todo-detail"),
 ]
