@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import { redirect } from "next/navigation";
 import { Inter } from "next/font/google";
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
@@ -69,9 +70,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersObj = await headers()
+  const pathname = headersObj.get("x-invoke-path") || "";
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
-
+  if (!user && !pathname.startsWith("/login")) redirect("/login");
+  
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning={true}>
       <head>
