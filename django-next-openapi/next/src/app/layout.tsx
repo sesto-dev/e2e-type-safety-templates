@@ -1,12 +1,16 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata, Viewport } from "next";
+import { redirect } from "next/navigation";
+import { Inter } from "next/font/google";
+
 import ThemeProvider from "~/components/shared/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
+import { siteConfig } from "~/config/site";
+import getCurrentUser from "~/lib/server/current-user";
+
 import "./globals.css";
 
-import type { Metadata, Viewport } from "next";
-import { siteConfig } from "~/config/site";
-import { Inter } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -65,6 +69,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning={true}>
       <head>
