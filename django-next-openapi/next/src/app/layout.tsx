@@ -1,6 +1,5 @@
 export const dynamic = "force-dynamic";
 
-import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import { redirect } from "next/navigation";
 import { Inter } from "next/font/google";
@@ -57,7 +56,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   width: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
@@ -70,7 +69,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
+
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning={true}>
       <head>

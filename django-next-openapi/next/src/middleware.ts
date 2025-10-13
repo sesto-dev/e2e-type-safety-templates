@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const isAuthRoute = req.nextUrl.pathname.startsWith("/login");
-  const token = req.cookies.get("sessionid")?.value; // adjust cookie name for Django session
+export async function middleware(req: NextRequest) {
+  const isAuthRoute = req.nextUrl.pathname.includes("/login");
+  const token = req.cookies.get("access_token")?.value; // adjust cookie name for Django session
 
   // If not logged in and trying to access a protected page
   if (!token && !isAuthRoute) {
