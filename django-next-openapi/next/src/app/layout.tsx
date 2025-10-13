@@ -78,7 +78,7 @@ export default async function RootLayout({
         <meta name="theme-color" content="#FFFFFF" />
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Toaster />
           {children}
         </ThemeProvider>

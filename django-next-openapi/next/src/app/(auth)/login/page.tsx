@@ -20,7 +20,8 @@ export default async function SignInViewPage() {
     headers: { cookie: await getCurrentCookies() },
   });
 
-  if (res.data) redirect("/");
+  console.log({res})
+  if (res.error) redirect("/");
 
   return (
     <div className="relative h-screen flex-col items-center justify-center">
