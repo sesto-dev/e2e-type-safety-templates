@@ -12,6 +12,9 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
+from dashboard.models import Todo
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
@@ -40,3 +43,32 @@ class UserViewSet(AuthenticatedViewSet):
     def get_object(self):
         # Always operate on the authenticated user for /users/me style endpoints
         return self.request.user
+    
+
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user
+
+class TodoListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.TodoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return todos for the authenticated user
+        return Todo.objects.filter(owner=self.request.user).order_by("-created_at")
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class TodoRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.TodoSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    lookup_field = "id"
+    queryset = Todo.objects.all()
+
+    def get_object(self):
+        obj = super().get_object()
+        # IsOwner permission will check ownership; raise PermissionDenied for clarity
+        if obj.owner != self.request.user:
+            raise PermissionDenied("You do not have permission to access this Todo.")
+        return obj

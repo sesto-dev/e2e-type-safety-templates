@@ -840,10 +840,6 @@
                         "type": "integer",
                         "readOnly": true
                     },
-                    "username": {
-                        "type": "string",
-                        "readOnly": true
-                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -891,8 +887,7 @@
                     "id",
                     "is_email_verified",
                     "name",
-                    "phone",
-                    "username"
+                    "phone"
                 ]
             },
             "Group": {
@@ -915,33 +910,35 @@
             "Login": {
                 "type": "object",
                 "properties": {
-                    "username": {
+                    "email": {
                         "type": "string",
-                        "description": "The user's username."
+                        "format": "email",
+                        "description": "User email"
                     }
                 },
                 "required": [
-                    "username"
+                    "email"
                 ]
             },
             "LoginRequest": {
                 "type": "object",
                 "properties": {
-                    "username": {
+                    "email": {
                         "type": "string",
+                        "format": "email",
                         "minLength": 1,
-                        "description": "The user's username."
+                        "description": "User email"
                     },
                     "password": {
                         "type": "string",
                         "writeOnly": true,
                         "minLength": 1,
-                        "description": "The user's password."
+                        "description": "Password"
                     }
                 },
                 "required": [
-                    "password",
-                    "username"
+                    "email",
+                    "password"
                 ]
             },
             "PaginatedUserList": {
@@ -1023,10 +1020,6 @@
             "Register": {
                 "type": "object",
                 "properties": {
-                    "username": {
-                        "type": "string",
-                        "maxLength": 150
-                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -1039,18 +1032,12 @@
                     }
                 },
                 "required": [
-                    "email",
-                    "username"
+                    "email"
                 ]
             },
             "RegisterRequest": {
                 "type": "object",
                 "properties": {
-                    "username": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 150
-                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -1070,8 +1057,7 @@
                 },
                 "required": [
                     "email",
-                    "password",
-                    "username"
+                    "password"
                 ]
             },
             "User": {

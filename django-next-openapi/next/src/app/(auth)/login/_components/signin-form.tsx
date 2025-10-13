@@ -12,6 +12,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import Icons from "~/components/shared/icons";
 import { toast } from "sonner";
+import { apiAuthLoginCreate, apiAuthRegisterCreate } from "~/client";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -50,16 +51,12 @@ export default function SignInForm() {
   async function submitLogin(data: LoginFormData) {
     setIsLoading(true);
     try {
-      const res = await fetch(`${baseUrl}/api/auth/login/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
+      const res = await apiAuthLoginCreate({
+        body: data
+      })
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || "Invalid credentials");
+      if (res.error) {
+        throw new Error("Invalid credentials");
       }
 
       toast.success("Signed in successfully");
@@ -75,16 +72,12 @@ export default function SignInForm() {
   async function submitRegister(data: RegisterFormData) {
     setIsLoading(true);
     try {
-      const res = await fetch(`${baseUrl}/api/auth/register/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
+      const res = await apiAuthRegisterCreate({
+        body: data
+      })
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || "Registration failed");
+      if (res.error) {
+        throw new Error("Registration failed");
       }
 
       toast.success("Account created — you are now signed in");
