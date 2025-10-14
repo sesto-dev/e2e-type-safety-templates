@@ -1,4 +1,4 @@
-// next/src/app/admin/user/edit/page.tsx
+// next/src/app/user/edit/page.tsx
 import PageContainer from "~/components/layout/page-container";
 import ProfileCreateForm from "./_components/user-form";
 import getCurrentUser from "~/lib/server/current-user";

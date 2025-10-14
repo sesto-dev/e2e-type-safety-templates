@@ -1,4 +1,4 @@
-// next/src/app/admin/todos/page.tsx
+// next/src/app/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";

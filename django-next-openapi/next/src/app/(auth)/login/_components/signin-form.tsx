@@ -60,7 +60,7 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      router.push("/admin");
+      router.push("/");
     } catch (err: any) {
       console.error("Login error:", err);
       toast.error(err?.message ?? "Login failed");
@@ -81,7 +81,7 @@ export default function SignInForm() {
       }
 
       toast.success("Account created — you are now signed in");
-      router.push("/admin");
+      router.push("/");
     } catch (err: any) {
       console.error("Register error:", err);
       toast.error(err?.message ?? "Registration failed");
@@ -92,28 +92,23 @@ export default function SignInForm() {
 
   return (
     <>
-      <Card className="py-2">
+      <Card className="p-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex gap-2">
-              <button
-                className={`px-3 py-1 rounded-md ${
-                  mode === "login" ? "bg-primary text-white" : "bg-transparent"
-                }`}
+            <div className="flex gap-2">\
+              {mode === "login" ? <Button
+                className={`p-2 rounded-md`}
                 onClick={() => setMode("login")}
                 type="button"
               >
                 Sign in
-              </button>
-              <button
-                className={`px-3 py-1 rounded-md ${
-                  mode === "register" ? "bg-primary text-white" : "bg-transparent"
-                }`}
+              </Button> : <Button
+                className={`p-2 rounded-md`}
                 onClick={() => setMode("register")}
                 type="button"
               >
                 Register
-              </button>
+              </Button> }
             </div>
             <div className="text-sm text-muted-foreground">
               {mode === "login" ? "Use your email & password" : "Create a new account"}

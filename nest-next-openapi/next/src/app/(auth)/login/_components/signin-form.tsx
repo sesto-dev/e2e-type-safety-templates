@@ -100,7 +100,7 @@ export default function UserAuthForm() {
       setCountdown(0)
       reset()
       toast('You have successfully logged in!')
-      router.push('/admin')
+      router.push('/')
     } catch (error: any) {
       console.error('OTP verification failed', error)
       toast('OTP verification was unsuccessful.')
