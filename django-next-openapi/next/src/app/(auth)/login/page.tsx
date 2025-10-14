@@ -1,27 +1,24 @@
-"use server";
+'use server'
 
-import Link from "next/link";
-import SignInForm from "./_components/signin-form";
-import { apiAuthMeRetrieve } from "~/client";
-import { getCurrentCookies } from "~/lib/server/cookies";
-import { redirect } from "next/navigation";
+import Link from 'next/link'
+import SignInForm from './_components/signin-form'
+import { apiAuthMeRetrieve } from '~/client'
+import { getCurrentCookies } from '~/lib/server/cookies'
+import { redirect } from 'next/navigation'
 
 export async function generateMetadata() {
   return {
-    title: "Sign In",
-    description: "Register or log in to your account",
-  };
+    title: 'Sign In',
+    description: 'Register or log in to your account',
+  }
 }
 
 export default async function SignInViewPage() {
   // If user already has a session cookie, redirect them
   const res = await apiAuthMeRetrieve({
-    credentials: "include",
+    credentials: 'include',
     headers: { cookie: await getCurrentCookies() },
-  });
-
-  console.log({res})
-  // if (res.error) redirect("/");
+  })
 
   return (
     <div className="relative h-screen flex-col items-center justify-center">
@@ -40,15 +37,15 @@ export default async function SignInViewPage() {
           <SignInForm />
 
           <p className="px-8 text-center text-sm text-muted-foreground">
-            By signing in, you agree to our{" "}
+            By signing in, you agree to our{' '}
             <Link
               target="_blank"
               href="/legal/tos"
               className="underline underline-offset-4 hover:text-primary"
             >
               Terms of Service
-            </Link>{" "}
-            and{" "}
+            </Link>{' '}
+            and{' '}
             <Link
               target="_blank"
               href="/legal/privacy"
@@ -61,5 +58,5 @@ export default async function SignInViewPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

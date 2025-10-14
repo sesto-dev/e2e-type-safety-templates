@@ -85,7 +85,7 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
+    <div className="max-w-3xl mx-auto p-8">
       <h1 className="text-2xl font-semibold mb-4">Todos</h1>
 
       <form onSubmit={handleCreate} className="mb-4 space-y-2">
