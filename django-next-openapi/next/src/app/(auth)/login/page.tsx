@@ -21,7 +21,7 @@ export default async function SignInViewPage() {
   });
 
   console.log({res})
-  if (res.error) redirect("/");
+  // if (res.error) redirect("/");
 
   return (
     <div className="relative h-screen flex-col items-center justify-center">
