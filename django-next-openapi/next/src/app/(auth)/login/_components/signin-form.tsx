@@ -60,7 +60,7 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      router.push("/");
+      router.push("/admin");
     } catch (err: any) {
       console.error("Login error:", err);
       toast.error(err?.message ?? "Login failed");
@@ -81,7 +81,7 @@ export default function SignInForm() {
       }
 
       toast.success("Account created — you are now signed in");
-      router.push("/");
+      router.push("/admin");
     } catch (err: any) {
       console.error("Register error:", err);
       toast.error(err?.message ?? "Registration failed");
@@ -96,19 +96,24 @@ export default function SignInForm() {
         <CardContent className="px-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex gap-2">\
-              {mode === "login" ? <Button
-                className={`p-2 rounded-md`}
+              <Button
+                className={`p-2 rounded-md ${
+                  mode === "login" ? "" : "bg-transparent"
+                }`}
                 onClick={() => setMode("login")}
                 type="button"
               >
                 Sign in
-              </Button> : <Button
-                className={`p-2 rounded-md`}
+              </Button>
+              <Button
+                className={`p-2 rounded-md ${
+                  mode === "register" ? "" : "bg-transparent"
+                }`}
                 onClick={() => setMode("register")}
                 type="button"
               >
                 Register
-              </Button> }
+              </Button>
             </div>
             <div className="text-sm text-muted-foreground">
               {mode === "login" ? "Use your email & password" : "Create a new account"}
