@@ -1,0 +1,51 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider = "prisma-zod-generator" // or another active zod generator
+  output   = "../generated/zod"
+  // optional generator options here
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String   @id @default(uuid())
+  email                   String   @unique
+  phone                   String?  @unique
+  avatar                  String?
+  name                    String?
+  birthday                DateTime?
+  otp                     String?
+  email_unsubscribe_token String   @default(uuid())
+  referral_code           String   @unique @default(uuid()) // adjust to short hex if needed
+  is_banned               Boolean  @default(false)
+  is_email_verified       Boolean  @default(false)
+  is_phone_verified       Boolean  @default(false)
+  is_email_subscribed     Boolean  @default(false)
+  is_phone_subscribed     Boolean  @default(false)
+  is_staff                Boolean  @default(false)
+  is_active               Boolean  @default(true)
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  todos Todo[]
+}
+
+model Todo {
+  id         String   @id @default(uuid())
+  ownerId    String
+  owner      User     @relation(fields: [ownerId], references: [id])
+  title      String
+  description String  @default("")
+  is_complete Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([ownerId])
+}
